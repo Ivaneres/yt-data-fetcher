@@ -1,0 +1,13 @@
+beautifulsoup4==4.9.3
+certifi==2020.12.5
+chardet==4.0.0
+idna==2.10
+lxml==4.6.2
+numpy==1.19.5
+opencv-python==4.5.1.48
+pkg-resources==0.0.0
+pytube==10.4.1
+requests==2.25.1
+soupsieve==2.1
+typing-extensions==3.7.4.3
+urllib3==1.26.2
