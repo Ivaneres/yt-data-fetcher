@@ -49,7 +49,10 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
         video_path = f'{self._outdir}/{sanitize_filename(information["title"])}'
         if not os.path.exists(self._outdir):
             os.mkdir(self._outdir)
-        if not os.path.exists(video_path):
+        if os.path.exists(video_path):
+            print("[extractor] Folder with this name already exists. Stopping")
+            return [], information
+        else:
             os.mkdir(video_path)
         path = information['filepath']
         options = ['-vf', f'fps=1/{self._interval}']
@@ -68,7 +71,7 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
         if self._duration is not None:
             options += ['-t', str(self._duration)]
         timer = time.time()
-        print(f"[converter] Starting conversion")
+        print(f"[extractor] Starting conversion")
         images = 0
         with ThreadPoolExecutor(max_workers=10) as executor:
             for i in range(0, information["duration"] // self._interval):
@@ -77,7 +80,7 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
                       [f"{video_path}/{i}.jpg"]
                 executor.submit(subprocess.call, cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 images += 1
-        print(f"[converter] Produced {images} images in {round(time.time() - timer, 3)}s")
+        print(f"[extractor] Produced {images} images in {round(time.time() - timer, 3)}s")
         if self._delete_video:
             return [information['filepath']], information
         else:
