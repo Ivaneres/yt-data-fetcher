@@ -22,9 +22,9 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
         :type interval: int
         :param outdir: output directory name
         :type outdir: str
-        :param start: start time
+        :param start: start time UNIMPLEMENTED
         :type start: Union[int, str], optional
-        :param duration: duration to record for
+        :param duration: duration to record for  UNIMPLEMENTED
         :type duration: Union[int, str], optional
         :param ar: aspect ratio. Images will be cropped to this.
         :type ar: int
@@ -37,8 +37,8 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
         """
         self._interval = interval
         self._outdir = outdir
-        self._start = start
-        self._duration = duration
+        self._start = start  # unimplemented
+        self._duration = duration  # unimplemented
         self._ar = ar
         self._width = width
         self._height = height
@@ -55,7 +55,7 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
         else:
             os.mkdir(video_path)
         path = information['filepath']
-        options = ['-vf', f'fps=1/{self._interval}']
+        options = ['-vf']
         if self._width is not None or self._height is not None:
             if self._width is None:
                 self._width = self._height
@@ -63,13 +63,9 @@ class FFmpegImageExtractorPP(FFmpegPostProcessor):
                 self._height = self._width
             vid_height = information["height"]
             vid_width = information["width"]
-            crop_pos_x = (vid_width * self._ar - vid_width) // 2 if self._ar >= 1 else 0
-            options[-1] += f',crop={vid_height * self._ar}:{vid_height}:{crop_pos_x}:0' \
-                           f',scale={self._width}:{self._height}'
-        if self._start is not None:
-            options += ['-ss', str(self._start)]
-        if self._duration is not None:
-            options += ['-t', str(self._duration)]
+            new_width = vid_height * self._ar
+            crop_pos_x = abs(vid_width - new_width) // 2 if self._ar >= 1 else 0
+            options.append(f'crop={new_width}:{vid_height}:{crop_pos_x}:0,scale={self._width}:{self._height}')
         timer = time.time()
         print(f"[extractor] Starting conversion")
         images = 0
